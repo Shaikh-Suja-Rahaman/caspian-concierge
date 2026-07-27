@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <strong>The Unofficial AI support agent for the Caspian SDK.<br/>One agent identity, answering questions across Email, Telegram, and Slack.</strong>
+  <strong>The Unofficial AI support agent for the Caspian SDK.<br/>One agent identity, answering questions across Email and Telegram</strong>
 </p>
 
 ---
