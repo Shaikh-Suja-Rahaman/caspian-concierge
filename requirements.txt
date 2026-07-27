@@ -3,4 +3,4 @@ google-genai==1.47.0
 httpx==0.28.1
 beautifulsoup4==4.12.3
 numpy==1.26.4
--e ../caspian-sdk/sdks/python
+caspian-sdk
