@@ -1,9 +1,14 @@
 import os
 import json
+# pyrefly: ignore [missing-import]
 import httpx
+# pyrefly: ignore [missing-import]
 import numpy as np
+# pyrefly: ignore [missing-import]
 from bs4 import BeautifulSoup
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
+# pyrefly: ignore [missing-import]
 from google import genai
 
 load_dotenv()
