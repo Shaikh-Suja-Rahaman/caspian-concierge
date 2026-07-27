@@ -44,7 +44,7 @@ The agent doesn't blindly stuff docs into its prompt. It uses a custom-built, li
 ## Get started in 30 seconds
 
 **Prerequisites:**
-- **Python 3.10+** (Strictly required by Caspian SDK)
+- **Python 3.10+** 
 - A Google Gemini API Key
 
 **Set it up:**
