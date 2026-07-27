@@ -15,54 +15,47 @@ client = CommClient()
 # Initialize Gemini Client
 gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
-def get_context():
-    # Attempt to load llms.txt for SDK instructions
-    context_text = ""
-    try:
-        with open("../caspian-sdk/llms.txt", "r") as f:
-            context_text += f.read() + "\n\n"
-    except Exception as e:
-        print(f"Warning: could not load llms.txt: {e}")
-        
-    try:
-        with open("auth.txt", "r") as f:
-            context_text += f.read() + "\n\n"
-    except Exception as e:
-        print(f"Warning: could not load auth.txt: {e}")
-        
-    return context_text
+import rag
 
-CONTEXT = get_context()
+chat_sessions = {}
 
-SYSTEM_PROMPT = f"""You are the Caspian Concierge, an official AI support agent for the Caspian SDK.
+@client.on_message
+def handle(message):
+    print(f"Received message from {message.sender} on {message.conversation_id} via {message.channel}: {message.text}")
+    
+    # Retrieve relevant RAG context for this specific message
+    retrieved_docs = rag.retrieve(message.text, top_k=3)
+    
+    system_instruction = f"""You are the Caspian Concierge, an official AI support agent for the Caspian SDK.
 Your job is to help developers integrate Caspian into their apps. You can answer questions about API keys, channels, handlers, and the SDK surface.
 You speak clearly and concisely. You are friendly and encouraging.
 
-Here is the official documentation you must use to answer questions:
+Here is the retrieved official documentation you must use to answer this specific question:
 
-{CONTEXT}
+{retrieved_docs}
 
 Important Instructions:
 - Only answer questions related to the Caspian SDK, integrations, or messaging channels.
 - Emphasize that Caspian uses a single `on_message` handler for all channels.
 - Do not invent code snippets that use non-existent methods; rely on the provided documentation.
+
+CHANNEL FORMATTING RULE:
+- The user is currently chatting with you over the `{message.channel}` channel. 
+- If the channel is `email`, DO NOT use markdown code blocks (```). Just use plain text indentation for code so it renders nicely in standard email clients like Gmail.
+- If the channel is `telegram` or `discord`, you may use markdown code blocks.
 """
 
-@client.on_message
-def handle(message):
-    print(f"Received message from {message.sender} on {message.conversation_id}: {message.text}")
-    
-    # We maintain minimal history here, just passing the system prompt and the user's message
-    # In a full production bot, we would fetch previous messages in the thread if needed.
-    
-    try:
-        response = gemini_client.models.generate_content(
+    global chat_sessions
+    if message.conversation_id not in chat_sessions:
+        chat_sessions[message.conversation_id] = gemini_client.chats.create(
             model='gemini-2.5-flash',
-            contents=message.text,
             config=genai.types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
+                system_instruction=system_instruction,
             )
         )
+
+    try:
+        response = chat_sessions[message.conversation_id].send_message(message.text)
         reply_text = response.text
     except Exception as e:
         print(f"Error generating response: {e}")

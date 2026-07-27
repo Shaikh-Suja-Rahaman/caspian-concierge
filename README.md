@@ -1,60 +1,75 @@
-# Caspian Concierge
+# Caspian Concierge 🎩
 
-## Problem Statement
-The **Caspian Concierge** is an official AI support agent designed to help developers successfully integrate the Caspian SDK. It solves a real support burden: new developers often have questions about how to connect channels (Slack, Discord, Telegram, WhatsApp) or structure their single `on_message` handler. Instead of searching through docs, developers can chat with the concierge across the channels they already use. 
+**An official AI support agent for the [Caspian SDK](https://github.com/TryCaspian/caspian-sdk).** 
 
-## Features
-- **Multi-channel Reachability**: Built entirely on the Caspian SDK, the agent can be reached via Email, Telegram, Slack, or any other supported channel. It maintains one identity.
-- **Powered by Caspian**: Leverages a single `on_message` handler for all incoming queries.
-- **Context-Aware**: Injects Caspian's `llms.txt` and authentication guides into its system prompt to give perfectly accurate answers.
-- **LLM Integration**: Uses Google Gemini to generate helpful, friendly responses.
+Built for the Caspian Internship Challenge (#118), this agent helps developers set up Caspian, troubleshoot integration issues, and understand channel connections—all without ever leaving the communication channels they already use.
 
-## Setup & Local Run Steps
+---
 
-### 1. Requirements
-- Python 3.10+
-- Caspian SDK installed
-- A Google Gemini API key
+## ⚡ Features
 
-### 2. Environment Variables
-Copy the provided `.env.example` to `.env` or set these in your environment:
-```bash
-CASPIAN_API_KEY=comm_sandbox_xxxxxxxxxxxxx
-CASPIAN_BASE_URL=https://api.trycaspianai.com
-GEMINI_API_KEY=your_gemini_api_key
-```
-*(Note: A sandbox key for Caspian is sufficient for free channels. If you wish to use paid channels like X or iMessage, you must sign in via the OAuth device flow to get a paid key.)*
+- **Omnichannel Reachability**: Talk to the bot via Email, Telegram, Slack, or any channel supported by Caspian.
+- **Single Handler Architecture**: Demonstrates the core thesis of Caspian—one `on_message` handler powering interactions across multiple distinct platforms simultaneously.
+- **Context-Aware Formatting**: Automatically detects the channel (`message.channel`) and formats its output accordingly (e.g., plain text for Email, Markdown for Telegram).
+- **Context-Injected Accuracy**: Injects the official Caspian `llms.txt`, `README.md`, and authentication guides directly into the prompt context for flawless answers.
 
-### 3. Installation
+---
+
+## 🚀 Quickstart
+
+### Prerequisites
+- **Python 3.10+** (Strictly required by Caspian SDK)
+- A [Google Gemini API Key](https://aistudio.google.com/)
+
+### 1. Installation
+
 ```bash
 # Clone the repository
-git clone <repository_url>
+git clone https://github.com/Shaikh-Suja-Rahaman/caspian-concierge.git
 cd caspian-concierge
 
-# Create virtual environment
-python3 -m venv venv
+# Create and activate a virtual environment
+python3.11 -m venv venv
+source venv/bin/activate  # (Or activate.fish for Fish shell)
 
-# Activate it (Bash/Zsh)
-source venv/bin/activate
-# Or if you are using Fish shell:
-# source venv/bin/activate.fish
-
-# Install dependencies
+# Upgrade pip and install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Running the Agent
+### 2. Configuration
+Copy the provided `.env.example` (or create a `.env` file) in the root directory:
+
+```env
+CASPIAN_API_KEY=comm_sandbox_xxxxxxxxxxxxx
+CASPIAN_BASE_URL=https://api.trycaspianai.com
+GEMINI_API_KEY=your_gemini_api_key_here
+TELEGRAM_BOT_TOKEN=your_telegram_token_here  # Optional
+```
+
+*Note: Free channels (Email, Telegram) use an anonymous sandbox key. Paid channels require signing in via the Caspian OAuth device flow.*
+
+### 3. Run the Agent
+
 ```bash
 python main.py
 ```
-Upon running, the agent will instantly connect to an email sandbox channel and block to listen for incoming messages across all connected channels.
+*The agent will immediately connect to its provisioned email address and any Telegram bots provided in your `.env`.*
 
-## How to talk to the Agent
-- If you're running it locally using a free sandbox key, you can connect your Telegram bot token or Discord app to the agent by adding a line in `main.py` (e.g., `client.connect_telegram(bot_token="...")`).
-- You can also test it by sending a test event to the local handler via the Caspian CLI or by using `POST {base}/v1/test-emails`.
+---
 
-## Evaluation Criteria Addressed
-- **Problem it solves**: Concrete developer support for the Caspian SDK itself.
-- **Code Quality**: Concise, readable `main.py` utilizing standard Python best practices and `.env` for secrets.
-- **Adoption / Usage**: The bot can genuinely be deployed and a Telegram/Discord link shared in the intern challenge issue to help other participants unblock themselves.
-- **How Caspian fits**: It's not bolted on—the product thesis *is* the Caspian framework. One handler, multiple channels. 
+## 💬 Talk to the Agent
+
+You can interact with the Caspian Concierge right now! 
+- **Telegram**: [t.me/caspian_concierge_bot](https://t.me/caspian_concierge_bot)
+- **Email**: `caspian-concierge@agents.trycaspianai.com`
+
+*Try asking it: "How do I install a Discord bot using the SDK?" or "What's the difference between connect_slack and install_slack?"*
+
+---
+
+## 🧠 Evaluation Rubric Addressed
+- **Problem solved**: Directly reduces the developer support burden for Caspian itself.
+- **Code quality**: Minimal, readable surface area using standard `.env` secrets.
+- **Adoption**: Plausible, immediate use case for other challenge participants.
+- **Caspian integration**: The agent doesn't just *use* Caspian, it *proves* Caspian's core product value.
