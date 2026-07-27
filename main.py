@@ -1,4 +1,7 @@
 import os
+import time
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 # pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 # pyrefly: ignore [missing-import]
@@ -8,6 +11,19 @@ from google import genai
 
 # Load environment variables
 load_dotenv()
+
+# --- Dummy Server for Render Free Tier ---
+def run_dummy_server():
+    port = int(os.environ.get("PORT", 10000))
+    class HealthCheckHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"OK")
+    HTTPServer(("0.0.0.0", port), HealthCheckHandler).serve_forever()
+
+threading.Thread(target=run_dummy_server, daemon=True).start()
+# -----------------------------------------
 
 # Initialize Caspian Client
 client = CommClient()
