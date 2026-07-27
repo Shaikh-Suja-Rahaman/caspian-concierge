@@ -1,0 +1,55 @@
+Authentication & keys
+One API key is your project and your tenant boundary. There are two ways to get one: mint an anonymous key instantly for free channels, or sign in once with Google to unlock paid channels and top up prepaid pay-as-you-go credit (from a $1 minimum). Store it as CASPIAN_API_KEY and the SDK does the rest.
+
+The key is the tenant boundary#
+Everything the SDK does authenticates with a single bearer key. The SDK reads CASPIAN_API_KEY (and CASPIAN_BASE_URL) from the environment or a ./.env file next to your code, and sends it as Authorization: Bearer <key> on every request.
+
+One key maps to exactly one project. Every connection, conversation, and message lives under that project and is isolated from every other key's data. Keep the key server-side: anyone holding it can send and read on your agent's channels.
+
+Path 1: Anonymous key (free, no signup)#
+Free channels need no account: email, Telegram, Discord, Slack, Instagram, Facebook, and your own Twilio/Telnyx number (SMS) or your own Twilio WhatsApp. Mint a sandbox key with a single unauthenticated call:
+
+curl -s -X POST https://api.trycaspianai.com/v1/projects/sandbox \
+  -H 'Content-Type: application/json' -d '{"name":"my-agent"}'
+
+It returns a project and its key:
+{ "project_id": "proj_...", "api_key": "comm_sandbox_..." }
+
+Write api_key into .env as CASPIAN_API_KEY and start building.
+
+Path 2: Sign in with Google (paid channels + prepaid credit)#
+Paid channels (X today; WhatsApp, iMessage, and voice coming soon) run on Caspian's own network and require a one-time sign-in. Signing in also gives you a dashboard and lets you add prepaid pay-as-you-go credit (from a $1 minimum top-up), billed per message at cost. It uses the OAuth 2.0 device flow, so your agent never handles a password.
+
+Step 1: Start the device flow#
+Call /v1/auth/device/start. Pass your current anonymous api_key so the sandbox project (and everything you already connected) carries over into the signed-in account instead of starting fresh.
+
+curl -s -X POST https://api.trycaspianai.com/v1/auth/device/start \
+  -H 'Content-Type: application/json' \
+  -d '{"api_key":"comm_sandbox_xxxxxxxx"}'
+
+You get back a verification link and a device code to poll with.
+
+Step 2: Show the user the link and wait#
+Print verification_uri_complete for the developer and stop. They open it, sign in with Google, and approve. That browser step is the whole authentication.
+
+Step 3: Poll for the key#
+Poll /v1/auth/device/token with the device_code every interval seconds. While the user hasn't finished it returns {"status":"pending"}; once they sign in it returns approved with the upgraded key.
+
+curl -s -X POST https://api.trycaspianai.com/v1/auth/device/token \
+  -H 'Content-Type: application/json' \
+  -d '{"device_code":"dev_..."}'
+
+Write the returned api_key back to .env. Future runs reuse it and never sign in again.
+
+Free vs paid at a glance#
+Channel	Tier	Key needed
+Email	free	Anonymous sandbox key
+Telegram	free	Anonymous sandbox key
+Discord	free	Anonymous sandbox key
+Slack	free	Anonymous sandbox key
+Instagram / Facebook	free	Anonymous sandbox key
+SMS (your Twilio/Telnyx number)	free	Anonymous sandbox key
+WhatsApp (your own Twilio)	free	Anonymous sandbox key
+X (Twitter)	paid	Signed-in key
+WhatsApp (Caspian's hosted number)	paid	Signed-in key
+iMessage	paid	Signed-in key

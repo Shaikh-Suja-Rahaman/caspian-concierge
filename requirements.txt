@@ -1,0 +1,4 @@
+python-dotenv==1.2.1
+google-genai==1.47.0
+httpx==0.28.1
+-e ../caspian-sdk/sdks/python
