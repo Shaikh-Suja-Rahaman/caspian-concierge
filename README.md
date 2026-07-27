@@ -76,6 +76,20 @@ Then run the agent:
 python main.py
 ```
 
+## Docker Support 🐳
+
+This project is fully containerized and production-ready! You can run it on your machine or deploy it to any cloud provider (Render, AWS, Railway) seamlessly without dealing with Python virtual environments.
+
+**Build the image:**
+```bash
+docker build -t caspian-concierge .
+```
+
+**Run the container:**
+```bash
+docker run --env-file .env caspian-concierge
+```
+
 ## Talk to the Agent
 
 You can interact with the Caspian Concierge right now! 
